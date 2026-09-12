@@ -22,7 +22,7 @@ std::optional<std::vector<Token>> Lexer::tokenize() {
         uint64_t start = m_current;
 
         auto curr = advance();
-        if (!curr.has_value()) break;
+        if (!curr.has_value() or std::isblank(*curr)) break;
 
         auto next = peek();
         if (next.has_value()) {
@@ -69,12 +69,42 @@ std::optional<std::vector<Token>> Lexer::tokenize() {
             tokens.push_back(token);
             continue;
         }
+
+        if (*curr == '#') {
+            while (!isAtEnd()) {
+                auto next = advance();
+                if (!next.has_value()
+                    or !std::isalpha(*next)
+                    ) break;
+            }
+            Span span = { start, m_current };
+            // offset 1 to shadow '#'
+            std::string_view str = m_source.substr(start + 1, m_current);
+            if (m_comp_keywords.contains(str)) {
+                Token token = { m_comp_keywords[str], span };
+                tokens.push_back(token);
+                break;
+            }
+            logger.addError({
+                std::format("unknown comp-keyword '{}'", str),
+                ErrorGroup::LexerErrorKind,
+                { .lex = LexerErrorKind::UnknownCompKeyword },
+                &span,
+            });
+        }
+
+        if (*curr == '/' and *next == '/') {
+            while (!isAtEnd()) {
+                if (advance().value() == '\n') break;
+            }
+        }
+
         Span span = { start, m_current };
         logger.addError({
-            std::format("unexpected character '{}'", curr.value()),
+            std::format("unexpected character ' {} '", curr.value()),
             ErrorGroup::LexerErrorKind,
             { .lex = LexerErrorKind::UnexpectedCharacter },
-            &span
+            &span,
         });
     }
     tokens.emplace_back(End, Span{m_current, m_current});

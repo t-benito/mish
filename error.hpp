@@ -6,6 +6,7 @@
 
 enum class LexerErrorKind: int {
     UnexpectedCharacter,
+    UnknownCompKeyword,
 };
 
 enum class ErrorGroup {

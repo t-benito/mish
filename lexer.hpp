@@ -11,8 +11,15 @@ enum class TokenKind {
     Number,
     // <a-0-9-z>, <A-0-9-Z>
     Identifier,
+
     KwLet,
     KwFn,
+    /* Compiler keywords
+     * as in:
+     * #<x>
+     */
+    CompKwAsm,
+
     // =
     Assign,
     // ==
@@ -86,6 +93,9 @@ private:
     std::unordered_map<std::string_view, TokenKind> m_keywords = {
         { "let", TokenKind::KwLet },
         { "fn", TokenKind::KwLet },
+    };
+    std::unordered_map<std::string_view, TokenKind> m_comp_keywords = {
+        { "asm", TokenKind::CompKwAsm },
     };
 };
 

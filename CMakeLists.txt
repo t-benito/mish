@@ -17,6 +17,8 @@ add_executable(mish main.cpp
         lexer.cpp
         lexer.hpp
         error.cpp
-        error.hpp)
+        error.hpp
+        parser.cpp
+        parser.hpp)
 
 target_link_libraries(mish PRIVATE CLI11::CLI11 stdc++exp)

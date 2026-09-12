@@ -20,8 +20,5 @@ int main() {
     auto tokens = lex.tokenize();
     if (!tokens.has_value()) return 1;
 
-    for (auto& token : tokens.value()) {
-        auto t = std::to_underlying(token.kind);
-        std::println("{}", t);
-    }
+
 }

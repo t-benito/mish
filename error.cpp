@@ -41,7 +41,20 @@ bool ErrorLogger::dump() {
         }
 
         std::string_view span = m_source.substr(lineStart, lineEnd);
-        std::println("{}", span);
+        std::println("\n          \033[31m{}  \033[3;90m(line {})\033[0m", span, line);
+          std::print("          \033[1m");
+        for (uint64_t i = 0; i < span.size(); ++i) {
+            if (i == error.span->start) {
+                std::print("^");
+                continue;
+            }
+            if (i < error.span->end and i > error.span->start) {
+                std::print("~");
+                continue;
+            }
+            std::print(" ");
+        }
+        std::print("\033[0m\n");
     }
 
     return true;
