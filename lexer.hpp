@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-enum TokenKind {
+enum class TokenKind {
     // 0-9
     Number,
     // <a-0-9-z>, <A-0-9-Z>
@@ -51,7 +51,7 @@ enum TokenKind {
     OpenParen,
     // )
     CloseParen,
-    EOF,
+    End,
 };
 
 struct Span {
@@ -68,7 +68,7 @@ class Lexer {
 public:
     explicit Lexer(std::string_view source);
 
-    std::vector<Token> tokenize();
+    std::optional<std::vector<Token>> tokenize();
 private:
     uint64_t m_current;
     uint64_t m_line;
@@ -84,8 +84,8 @@ private:
     bool isAtEnd();
 
     std::unordered_map<std::string_view, TokenKind> m_keywords = {
-        { "let", KwLet },
-        { "fn", KwFn },
+        { "let", TokenKind::KwLet },
+        { "fn", TokenKind::KwLet },
     };
 };
 

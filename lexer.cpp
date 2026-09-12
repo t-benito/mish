@@ -1,6 +1,9 @@
-#include "lexer.h"
+#include "lexer.hpp"
 
 #include <cctype>
+#include <format>
+
+#include "error.hpp"
 
 Lexer::Lexer(std::string_view source)
 :   m_current(0),
@@ -9,8 +12,11 @@ Lexer::Lexer(std::string_view source)
     m_source(source)
 {}
 
-std::vector<Token> Lexer::tokenize() {
+using enum TokenKind;
+
+std::optional<std::vector<Token>> Lexer::tokenize() {
     std::vector<Token> tokens;
+    ErrorLogger logger(m_source);
 
     while (!isAtEnd()) {
         uint64_t start = m_current;
@@ -61,9 +67,22 @@ std::vector<Token> Lexer::tokenize() {
             }();
             Token token = { kind, span };
             tokens.push_back(token);
+            continue;
         }
-        // TODO: Error handling here
+        Span span = { start, m_current };
+        logger.addError({
+            std::format("unexpected character '{}'", curr.value()),
+            ErrorGroup::LexerErrorKind,
+            { .lex = LexerErrorKind::UnexpectedCharacter },
+            &span
+        });
     }
+    tokens.emplace_back(End, Span{m_current, m_current});
+
+    if (logger.dump()) {
+        return std::nullopt;
+    }
+
     return tokens;
 }
 
